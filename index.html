@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Craft Kalkulátor - Retro Edition</title>
+    <title>Craft</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         
@@ -60,6 +60,35 @@
         @keyframes glow {
             from { text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3), 0 0 10px #fff; }
             to { text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3), 0 0 20px #fff, 0 0 30px #fff; }
+        }
+        
+        .mode-toggle {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .mode-btn {
+            background: rgba(0, 0, 0, 0.6);
+            border: 3px solid #fff;
+            color: #fff;
+            padding: 15px 30px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.2s;
+            box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.3);
+        }
+        
+        .mode-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 7px 7px 0px rgba(0, 0, 0, 0.3);
+        }
+        
+        .mode-btn.active {
+            background: #00ff00;
+            color: #000;
+            border-color: #00ff00;
         }
         
         .price-panel {
@@ -190,11 +219,74 @@
             text-align: center;
             font-size: 12px;
         }
+        
+        .weapon-reset-btn {
+            background: #ff6600;
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 8px 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        
+        .weapon-reset-btn:hover {
+            background: #fff;
+            color: #ff6600;
+            transform: translateY(-2px);
+        }
+        
+        .weapon-reset-btn:active {
+            transform: translateY(0);
+        }
+        
+        .inventory-mode {
+            display: none;
+        }
+        
+        .inventory-mode.active {
+            display: block;
+        }
+        
+        .can-craft {
+            font-size: 10px;
+            color: #00ff00;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid #00ff00;
+            text-align: center;
+        }
+        
+        .cannot-craft {
+            font-size: 10px;
+            color: #ff0000;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid #ff0000;
+            text-align: center;
+        }
+        
+        .missing-resources {
+            font-size: 8px;
+            color: #ff6666;
+            margin-top: 5px;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🎮 CRAFT KALKULÁTOR 🎮</h1>
+        
+        <div class="mode-toggle">
+            <button class="mode-btn active" onclick="switchMode('cost')">💰 ÁR SZÁMOLÁS</button>
+            <button class="mode-btn" onclick="switchMode('inventory')">📦 KÉSZLET ELLENŐRZÉS</button>
+        </div>
         
         <div class="price-panel">
             <h2 style="font-size: 14px; margin-bottom: 15px; color: #ffd700;">💰 ANYAGÁRAK 💰</h2>
@@ -242,6 +334,52 @@
             </div>
         </div>
         
+        <div class="price-panel inventory-mode">
+            <h2 style="font-size: 14px; margin-bottom: 15px; color: #00ff00;">📦 A KÉSZLETED 📦</h2>
+            <div class="price-grid">
+                <div class="price-item">
+                    <label>FA MENNYISÉG:</label>
+                    <input type="number" id="inv-fa" value="0" min="0">
+                </div>
+                <div class="price-item">
+                    <label>GUMI MENNYISÉG:</label>
+                    <input type="number" id="inv-gumi" value="0" min="0">
+                </div>
+                <div class="price-item">
+                    <label>VAS MENNYISÉG:</label>
+                    <input type="number" id="inv-vas" value="0" min="0">
+                </div>
+                <div class="price-item">
+                    <label>RÉZ MENNYISÉG:</label>
+                    <input type="number" id="inv-rez" value="0" min="0">
+                </div>
+                <div class="price-item">
+                    <label>BAUXIT MENNYISÉG:</label>
+                    <input type="number" id="inv-bauxit" value="0" min="0">
+                </div>
+                <div class="price-item">
+                    <label>ARANY MENNYISÉG:</label>
+                    <input type="number" id="inv-arany" value="0" min="0">
+                </div>
+                <div class="price-item">
+                    <label>RUBIN MENNYISÉG:</label>
+                    <input type="number" id="inv-rubin" value="0" min="0">
+                </div>
+                <div class="price-item">
+                    <label>GYÉMÁNT MENNYISÉG:</label>
+                    <input type="number" id="inv-gyemant" value="0" min="0">
+                </div>
+                <div class="price-item">
+                    <label>EZÜST MENNYISÉG:</label>
+                    <input type="number" id="inv-ezust" value="0" min="0">
+                </div>
+                <div class="price-item">
+                    <label>URÁN MENNYISÉG:</label>
+                    <input type="number" id="inv-uran" value="0" min="0">
+                </div>
+            </div>
+        </div>
+        
         <div class="weapons-grid" id="weapons"></div>
     </div>
 
@@ -260,9 +398,70 @@
         };
 
         const quantities = {};
+        let currentMode = 'cost';
         
         function formatNumber(num) {
             return num.toLocaleString('hu-HU');
+        }
+        
+        function switchMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const inventoryPanels = document.querySelectorAll('.inventory-mode');
+            if (mode === 'inventory') {
+                inventoryPanels.forEach(panel => panel.classList.add('active'));
+            } else {
+                inventoryPanels.forEach(panel => panel.classList.remove('active'));
+            }
+            
+            renderWeapons();
+        }
+        
+        function getInventory() {
+            return {
+                fa: parseFloat(document.getElementById('inv-fa').value) || 0,
+                gumi: parseFloat(document.getElementById('inv-gumi').value) || 0,
+                vas: parseFloat(document.getElementById('inv-vas').value) || 0,
+                rez: parseFloat(document.getElementById('inv-rez').value) || 0,
+                bauxit: parseFloat(document.getElementById('inv-bauxit').value) || 0,
+                arany: parseFloat(document.getElementById('inv-arany').value) || 0,
+                rubin: parseFloat(document.getElementById('inv-rubin').value) || 0,
+                gyemant: parseFloat(document.getElementById('inv-gyemant').value) || 0,
+                ezust: parseFloat(document.getElementById('inv-ezust').value) || 0,
+                uran: parseFloat(document.getElementById('inv-uran').value) || 0
+            };
+        }
+        
+        function checkCanCraft(weapon, quantity) {
+            const inventory = getInventory();
+            const missing = [];
+            let canCraft = true;
+            
+            for (let [resource, amount] of Object.entries(weapon)) {
+                const needed = amount * quantity;
+                const has = inventory[resource] || 0;
+                if (has < needed) {
+                    canCraft = false;
+                    missing.push(`${resource.toUpperCase()}: ${has}/${needed} (hiány: ${needed - has})`);
+                }
+            }
+            
+            return { canCraft, missing };
+        }
+        
+        function calculateMaxCraftable(weapon) {
+            const inventory = getInventory();
+            let max = Infinity;
+            
+            for (let [resource, amount] of Object.entries(weapon)) {
+                const has = inventory[resource] || 0;
+                const possible = Math.floor(has / amount);
+                max = Math.min(max, possible);
+            }
+            
+            return max === Infinity ? 0 : max;
         }
         
         function calculateCost(weapon, quantity) {
@@ -291,6 +490,11 @@
             renderWeapons();
         }
         
+        function resetWeapon(name) {
+            quantities[name] = 1;
+            renderWeapons();
+        }
+        
         function renderWeapons() {
             const container = document.getElementById('weapons');
             container.innerHTML = '';
@@ -309,6 +513,31 @@
                 
                 const totalCost = calculateCost(resources, quantity);
                 
+                let additionalHTML = '';
+                if (currentMode === 'inventory') {
+                    const { canCraft, missing } = checkCanCraft(resources, quantity);
+                    const maxCraftable = calculateMaxCraftable(resources);
+                    
+                    if (canCraft) {
+                        additionalHTML = `
+                            <div class="can-craft">
+                                ✓ CRAFTOLHATÓ!<br>
+                                MAX: ${maxCraftable}x
+                            </div>
+                        `;
+                    } else {
+                        additionalHTML = `
+                            <div class="cannot-craft">
+                                ✗ HIÁNYOS ANYAGOK<br>
+                                MAX: ${maxCraftable}x
+                                <div class="missing-resources">
+                                    ${missing.join('<br>')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+                
                 card.innerHTML = `
                     <div class="weapon-name">${name}</div>
                     <div class="resources">${resourcesHTML}</div>
@@ -318,6 +547,8 @@
                         <button class="quantity-btn" onclick="updateQuantity('${name}', 1)">+</button>
                     </div>
                     <div class="total-cost">💵 ${formatNumber(totalCost)} 💵</div>
+                    ${additionalHTML}
+                    <button class="weapon-reset-btn" onclick="resetWeapon('${name}')">RESET</button>
                 `;
                 
                 container.appendChild(card);
