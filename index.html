@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Craft Kalkulátor - Retro Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 0, 0, 0.15) 0px,
+                    transparent 1px,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 3px
+                );
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3), 0 0 10px #fff; }
+            to { text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3), 0 0 20px #fff, 0 0 30px #fff; }
+        }
+        
+        .price-panel {
+            background: rgba(0, 0, 0, 0.6);
+            border: 4px solid #fff;
+            border-radius: 0;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.3);
+        }
+        
+        .price-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .price-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .price-item label {
+            font-size: 10px;
+            color: #ffd700;
+        }
+        
+        .price-item input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 10px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            width: 100%;
+        }
+        
+        .price-item input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .weapons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .weapon-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 3px solid #00ff00;
+            padding: 20px;
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s;
+        }
+        
+        .weapon-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.4);
+        }
+        
+        .weapon-name {
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: #00ff00;
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+        }
+        
+        .resources {
+            font-size: 9px;
+            line-height: 1.8;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+        
+        .resource-line {
+            margin: 5px 0;
+        }
+        
+        .total-cost {
+            font-size: 12px;
+            color: #ffd700;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #ffd700;
+            text-align: center;
+        }
+        
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .quantity-btn {
+            background: #00ff00;
+            border: 2px solid #fff;
+            color: #000;
+            width: 30px;
+            height: 30px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .quantity-btn:hover {
+            background: #fff;
+            transform: scale(1.1);
+        }
+        
+        .quantity-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .quantity-display {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 5px 15px;
+            min-width: 60px;
+            text-align: center;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 CRAFT KALKULÁTOR 🎮</h1>
+        
+        <div class="price-panel">
+            <h2 style="font-size: 14px; margin-bottom: 15px; color: #ffd700;">💰 ANYAGÁRAK 💰</h2>
+            <div class="price-grid">
+                <div class="price-item">
+                    <label>FA ÁRA:</label>
+                    <input type="number" id="price-fa" value="50" min="0">
+                </div>
+                <div class="price-item">
+                    <label>GUMI ÁRA:</label>
+                    <input type="number" id="price-gumi" value="250" min="0">
+                </div>
+                <div class="price-item">
+                    <label>VAS ÁRA:</label>
+                    <input type="number" id="price-vas" value="30" min="0">
+                </div>
+                <div class="price-item">
+                    <label>RÉZ ÁRA:</label>
+                    <input type="number" id="price-rez" value="35" min="0">
+                </div>
+                <div class="price-item">
+                    <label>BAUXIT ÁRA:</label>
+                    <input type="number" id="price-bauxit" value="500" min="0">
+                </div>
+                <div class="price-item">
+                    <label>ARANY ÁRA:</label>
+                    <input type="number" id="price-arany" value="1000" min="0">
+                </div>
+                <div class="price-item">
+                    <label>RUBIN ÁRA:</label>
+                    <input type="number" id="price-rubin" value="2000" min="0">
+                </div>
+                <div class="price-item">
+                    <label>GYÉMÁNT ÁRA:</label>
+                    <input type="number" id="price-gyemant" value="3000" min="0">
+                </div>
+                <div class="price-item">
+                    <label>EZÜST ÁRA:</label>
+                    <input type="number" id="price-ezust" value="800" min="0">
+                </div>
+                <div class="price-item">
+                    <label>URÁN ÁRA:</label>
+                    <input type="number" id="price-uran" value="5000" min="0">
+                </div>
+            </div>
+        </div>
+        
+        <div class="weapons-grid" id="weapons"></div>
+    </div>
+
+    <script>
+        const weapons = {
+            'Walther - Alap': { fa: 8, gumi: 8, vas: 32, rez: 16 },
+            'Harci': { fa: 10, gumi: 12, vas: 40, rez: 20 },
+            'Kicsi': { fa: 6, gumi: 8, vas: 24, rez: 12 },
+            'Heavy': { fa: 12, gumi: 16, vas: 48, rez: 24 },
+            'Antik': { arany: 8, fa: 10, vas: 36, rez: 20 },
+            'Five Seven': { bauxit: 24, fa: 12, rubin: 4, vas: 48, rez: 32 },
+            'M27 VVS': { bauxit: 32, fa: 16, gyemant: 8, vas: 60, rez: 40 },
+            'Combat HP VVS': { bauxit: 28, ezust: 12, fa: 14, vas: 56, rez: 36 },
+            'H05 VVS': { arany: 16, bauxit: 36, fa: 16, vas: 64, rez: 44 },
+            'M24 VVS': { bauxit: 40, uran: 12, fa: 20, vas: 72, rez: 48 }
+        };
+
+        const quantities = {};
+        
+        function formatNumber(num) {
+            return num.toLocaleString('hu-HU');
+        }
+        
+        function calculateCost(weapon, quantity) {
+            const prices = {
+                fa: parseFloat(document.getElementById('price-fa').value) || 0,
+                gumi: parseFloat(document.getElementById('price-gumi').value) || 0,
+                vas: parseFloat(document.getElementById('price-vas').value) || 0,
+                rez: parseFloat(document.getElementById('price-rez').value) || 0,
+                bauxit: parseFloat(document.getElementById('price-bauxit').value) || 0,
+                arany: parseFloat(document.getElementById('price-arany').value) || 0,
+                rubin: parseFloat(document.getElementById('price-rubin').value) || 0,
+                gyemant: parseFloat(document.getElementById('price-gyemant').value) || 0,
+                ezust: parseFloat(document.getElementById('price-ezust').value) || 0,
+                uran: parseFloat(document.getElementById('price-uran').value) || 0
+            };
+            
+            let total = 0;
+            for (let [resource, amount] of Object.entries(weapon)) {
+                total += (prices[resource] || 0) * amount * quantity;
+            }
+            return total;
+        }
+        
+        function updateQuantity(name, delta) {
+            quantities[name] = Math.max(1, (quantities[name] || 1) + delta);
+            renderWeapons();
+        }
+        
+        function renderWeapons() {
+            const container = document.getElementById('weapons');
+            container.innerHTML = '';
+            
+            for (let [name, resources] of Object.entries(weapons)) {
+                if (!quantities[name]) quantities[name] = 1;
+                const quantity = quantities[name];
+                
+                const card = document.createElement('div');
+                card.className = 'weapon-card';
+                
+                let resourcesHTML = '';
+                for (let [resource, amount] of Object.entries(resources)) {
+                    resourcesHTML += `<div class="resource-line">▸ ${resource.toUpperCase()}: ${amount * quantity}</div>`;
+                }
+                
+                const totalCost = calculateCost(resources, quantity);
+                
+                card.innerHTML = `
+                    <div class="weapon-name">${name}</div>
+                    <div class="resources">${resourcesHTML}</div>
+                    <div class="quantity-control">
+                        <button class="quantity-btn" onclick="updateQuantity('${name}', -1)">-</button>
+                        <div class="quantity-display">${quantity}x</div>
+                        <button class="quantity-btn" onclick="updateQuantity('${name}', 1)">+</button>
+                    </div>
+                    <div class="total-cost">💵 ${formatNumber(totalCost)} 💵</div>
+                `;
+                
+                container.appendChild(card);
+            }
+        }
+        
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', renderWeapons);
+        });
+        
+        renderWeapons();
+    </script>
+</body>
+</html>
